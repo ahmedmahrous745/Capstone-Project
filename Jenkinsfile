@@ -1,7 +1,6 @@
 pipeline {
-	agent any
-	stages {
-
+  agent any
+  stages {
 		stage('Lint HTML') {
 			steps {
 				sh 'tidy -q -e *.html'
@@ -80,10 +79,19 @@ pipeline {
 				withAWS(region:'us-east-1', credentials:'udacity_cred') {
 					sh '''
 						kubectl apply -f ./green-service.json
-					'''
-				}
-			}
-		}
+      }
+    }
 
-	}
+    stage('Create Clusters Configuration File') {
+      steps {
+        withAWS(region: 'us-east-1', credentials: 'udacity_cred') {
+          sh '''
+						aws eks --region us-east-1 update-kubeconfig --name capstonecluster
+					'''
+        }
+
+      }
+    }
+
+  }
 }
